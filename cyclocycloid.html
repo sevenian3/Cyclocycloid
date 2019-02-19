@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- Ian Short - 
+    Cyclocyloids as test-bed for developing SVG skills -->
+<!-- Saint Mary's University
+     Feb 2019 Halifax, NS -->
+
+<!-- Cyclocycloids - includes epicycles and hypocycles with arbitrary "pen" position 
+     Special feature - interior and exterior gears sizes and positions, and pen position
+    can drift patter to give pattern some skew --> 
+
+  <head>
+    <title>Skew Cyclocycloid</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Skewed drifting cyclocycloids"/>
+        <meta name="keywords" content="epicycle, hypocycle, cyclocycloid, roulette, spiral, geometry, math, mathematics, math art, mathematical art, 
+                                       algorithmic art, computational art, computer art, SVG, HTML5 />
+              Saint Mary's University, Saint Mary's Astronomy and Physics Department, Institute for Computational Astrophysics, ICA"/>
+        <meta name="author" content="Ian Short"/>
+  </head>
+
+  <body bgcolor="#999999" onload="main()">
+
+   <h2 style="color:blue"> 
+     Skewed drifting 
+     <a href="https://en.wikipedia.org/wiki/Cyclocycloid" target="_blank">
+        cyclocycloids
+     </a>  
+   </h2>
+
+   <h3 style="color:purple"> 
+     <a href="https://en.wikipedia.org/wiki/Epicycloid" target="_blank">
+       Epicycloids
+     </a> 
+     and 
+     <a href="https://en.wikipedia.org/wiki/Hypocycloid" target="_blank">
+       hypocycloids
+     </a> 
+     with arbitrary pen position 
+  </h3>
+
+<p></p>
+
+   <h5> 
+    With my own generic SVG point-plot and connect-the-dots procedures free for the 'copy-and-pasting'
+   </h5>
+<p></p>
+
+   <div id = "patIn" style="background-color:#BBEEFF">
+
+       <h2>Pattern inputs:</h2>
+
+       <form id = "basicForm">
+
+          <p>
+             Radius of central circle: <input type="number" name="intR" min="10" max="200" step="1" value="99"/> px.  <!-- 0 -->
+             Total drift: <input type="number" name="intDrift" min="-30" max="30" step="1" value="2"/> px.            <!-- 1 -->
+          </p>
+
+          <p>
+             Radius of rolling circle (can be -ve): <input type="number" name="extR" min="6" max="200" value="65"/> px.  <!-- 2 -->
+             Total drift: <input type="number" name="extDrift" min="-30" max="30" step="1" value="0"/> px. <br />        <!-- 3-->
+          </p>
+ 
+          <p>
+             Pen position (can be -ve): <input type="number" name="penFrac" min="-2" max="2" value="1.1"/> x Radius of rolling circle. <!-- 4-->
+             Total drift: <input type="number" name="penDrift" min="-36" max="36" step="1" value="6"/> px.<br />                        <!-- 5-->
+          </p>
+
+          <p>
+             Total position drifts: <br /> 
+             Horizontal: <input type="number" name="xDrift" min="-36" max="36" step="1" value="5"/> px.               <!-- 6 -->                                
+             Vertical:  <input type="number" name="yDrift" min="-36" max="36" step="1" value="3"/> px.                 <!-- 7-->
+          </p>
+
+          <p>
+             Completeness and resolution:<br />
+             <span style="color:red; font-weight:bold">Caution:</span> Larger numbers increase run time <br />          <!-- 8-->
+             Number of rotations: <input type="number" name="nCyc" min="1" max="36" step="1" value="18"/>                 <!-- 9-->
+             Sample points per rotation: <input type="number" name="nSmp" min="10" max="120" step="1" value="60"/>         <!-- 10-->
+          </p>
+
+       </form>
+
+   </div>
+
+   <div id = "stylIn" style="background-color:#BBFFEE">
+
+       <h2>Style inputs:</h2>
+
+          <form id="styleForm">
+
+
+          <p>                  
+            Plotting style:  
+            Line: <input type="radio" name="plotType" value="line" checked="checked" />                           <!-- 0 -->
+            Points: <input type="radio" name="plotType" value="points" />                                          <!-- 1 -->
+            Both: <input type="radio" name="plotType" value="both" /> <br />                                      <!-- 2 -->
+          </p>
+
+          <p>
+            Thickness/Size: 
+            Initial <input type="number" name="plot0" min="1" max="10" step="1" value="3"/> px.                <!-- 3 -->
+            Total drift: <input type="number" name="pDrift" min="-6" max="6" step="1" value="-1"/> px. <br />   <!-- 4 -->
+          </p>
+
+          <p>
+          Color (0 - 255):<br />
+          <span style="color:red">Red: 
+            Initial: <input type="number" name="r0" min="0" max="255" step="1" value="50"/>                      <!-- 5 -->
+            Drift: <input type="number" name="rDrift" min="-100" max="100" step="1" value="50"/>                    <!-- 6 -->
+          </span> </br>
+          <span style="color:green">Green: 
+            Initial: <input type="number" name="g0" min="0" max="255" step="1" value="125"/>                     <!-- 7 -->
+            Drift: <input type="number" name="gDrift" min="-100" max="100" step="1" value="0"/>                    <!-- 8 -->
+          </span></br> 
+          <span style="color:blue">Blue: 
+            Initial: <input type="number" name="b0" min="0" max="255" step="1" value="200"/>                     <!-- 9 -->
+            Drift: <input type="number" name="bDrift" min="-100" max="100" step="1" value="-50"/>                   <!-- 10  -->
+          </span></br>                     
+          </p>
+
+
+       </form>
+
+   </div>
+
+   <button onclick="main()" style="color:blue; font-size:24px; font-weight:bold">
+     Draw my pattern
+   </button>
+
+    <div id="thisDev" style="color:'#888888'">
+
+      <svg id="cnvs">
+
+      <svg>    
+
+    </div>
+
+    <script>
+
+//Need to be before main() for some weird scoping reason??
+    var xmlns = "http://www.w3.org/2000/svg";
+    var thisCnvs = document.getElementById("cnvs");
+
+    function main(){
+
+       //console.log(thisCnvs); //dbg
+       thisCnvs.setAttributeNS(null, 'width', '1200');
+       thisCnvs.setAttributeNS(null, 'height', '2400');
+
+//Erase anything already there:
+
+//First, remove all SVG elements:
+    //var listOfSVGNodes = document.querySelectorAll("svg");
+//We think everything will be a line or a circle:
+    var listOfLineNodes = document.querySelectorAll("line");
+    var listOfCircNodes = document.querySelectorAll("circle");
+
+    //var numSVGNodes = listOfSVGNodes.length;
+    var numLineNodes = listOfLineNodes.length;
+    var numCircNodes = listOfCircNodes.length;
+
+//We have to be prepared that this might be our first time through - ??:
+    //if (numSVGNodes > 0){
+
+//Remove line elements (axues, tickmarks, barns, etc.)
+       if (numLineNodes > 0){
+           for (var iNode = 0; iNode < numLineNodes; iNode++){
+               listOfLineNodes[iNode].parentNode.removeChild(listOfLineNodes[iNode]);
+           }
+       } //numLineNodes > 0 condition
+
+//Remove circle elements (axes, tickmarks, barns, etc.)
+       if (numCircNodes > 0){
+           for (var iNode = 0; iNode < numCircNodes; iNode++){
+               listOfCircNodes[iNode].parentNode.removeChild(listOfCircNodes[iNode]);
+           }
+       } //numCircNodes > 0 condition
+
+    //} //numSVGNdodes > 0 condition
+
+
+//Set default values for everything:
+
+//safe initiatlizations:
+       var x = 0;
+       var y = 0;
+       var lastX = x;
+       var lastY = y;
+
+//Primary inputs (which Spirograph (TM) "gears", and which hole for the pen):
+       var rInt = 100; //radius of interior "base" circle
+       var rExt = 30; //radius of rotating, revolving "exterior" circle, can be +ve (epicycloid) or -ve (hypocycloid)
+       var dPenFrac = 0.95;  // offset of pen nib from centre of exterior circle
+
+       var rTot = 0;
+       var rBrak = 0;
+
+//Number of cycles (factors of 2*pi radians)
+   var numCyc = 18;
+//Number of sample points per cycle:
+   var numSamp = 60;
+
+//Drift quantities:
+// - total accumulated drift in pixels, +ve or -ve
+    var xDrift = 0;
+    var yDrift = 0;
+    var intDrift = 10;
+    var extDrift = 0;
+    var penDrift = 0;
+
+//rgb colour drift 
+//initial values
+    var r0 = 0;
+    var g0 = 0;
+    var b0 = 0; 
+// - total accumulated out of 255  
+    var rDrift = 255;
+    var gDrift = 0;
+    var bDrift = 125;
+// size of plot symbols & thickness of line
+//initial value:
+    var plot0 = 1;
+//  - total accumulated in pixels
+    var plotDrift = 2; 
+
+//color and opac:ity defaults
+       var colr = 'black';
+       var r = 0;
+       var g = 0;
+       var b = 0;
+       var alpha = 1.0;
+
+      var plotStyle= 'line';
+
+       colr = "blue";  //default
+
+//Get the forms inputs:
+
+  var patternInputs = document.getElementById("basicForm");
+
+   rInt = patternInputs[0].value;
+   rInt = parseInt(rInt, 10);
+   intDrift = patternInputs[1].value;
+   intDrift = parseInt(intDrift, 10);
+   rExt = patternInputs[2].value;
+   rExt = parseInt(rExt, 10);
+   extDrift = patternInputs[3].value;
+   extDrift = parseInt(extDrift, 10);
+   dPenFrac = patternInputs[4].value;
+   dPenFrac = parseFloat(dPenFrac);
+   penDrift = patternInputs[5].value;
+   penDrift = parseInt(penDrift, 10);
+   xDrift = patternInputs[6].value;
+   xDrift = parseInt(xDrift, 10);
+   yDrift = patternInputs[7].value;
+   yDrift = parseInt(yDrift, 10);
+   numCyc = patternInputs[8].value;
+   numCyc = parseInt(numCyc, 10);
+   numSamp = patternInputs[9].value;
+   numSamp = parseInt(numSamp, 10);
+
+   console.log(rInt + " " + intDrift + " " + rExt + " " + extDrift + " " + dPenFrac + " " + 
+               penDrift + " " + xDrift + " " + yDrift + " " + numCyc + " " + numSamp);
+
+  var styleInputs = document.getElementById("styleForm");
+
+   if (styleInputs[0].checked){
+      plotStyle = styleInputs[0].value;
+   }
+   if (styleInputs[1].checked){
+      plotStyle = styleInputs[1].value;
+   }
+   if (styleInputs[2].checked){
+      plotStyle = styleInputs[2].value;
+   }
+   plot0 = styleInputs[3].value;
+   plot0 = parseInt(plot0, 10);
+   plotDrift = styleInputs[4].value;
+   plotDrift = parseInt(plotDrift, 10);
+   r0 = styleInputs[5].value;
+   r0 = parseInt(r0, 10);
+   rDrift = styleInputs[6].value;
+   rDrift = parseInt(rDrift, 10);
+   g0 = styleInputs[7].value;
+   g0 = parseInt(g0, 10);
+   gDrift = styleInputs[8].value;
+   gDrift = parseInt(gDrift, 10);
+   b0 = styleInputs[9].value;
+   b0 = parseInt(b0, 10);
+   bDrift = styleInputs[10].value;
+   bDrift = parseInt(bDrift, 10);
+
+   console.log(plotStyle + " " + plot0 + " " + plotDrift + " " + 
+               r0 + " " + rDrift + " " + g0 + " " + gDrift + " " + b0 + " " + bDrift);
+
+//Helper quantities:
+ 
+       //"cast" from integer to double - may not be necessary in JS:
+       rInt = 1.0e0 * rInt;
+       rExt = 1.0e0 * rExt;
+       dPen = 1.0e0 * dPenFrac * rExt;
+
+       rTot = rInt + rExt;
+       rBrak = rTot / rExt;
+
+   //Make sure calculated pixel coords are always in the +ve domaine
+   var offX = rExt + Math.abs(rInt) + Math.abs(dPen) + 50.0e0 + 
+              Math.abs(xDrift) + Math.abs(extDrift) + Math.abs(intDrift) + Math.abs(penDrift); 
+   var offY = rExt + Math.abs(rInt) + Math.abs(dPen) + 50.0e0 +
+              Math.abs(yDrift) + Math.abs(extDrift) + Math.abs(intDrift) + Math.abs(penDrift);
+   //console.log("offX " + offX + " offY " + offY);
+   plot(offX, offY, 2.0, 'black');  //central point //debug
+
+       var num = numCyc * numSamp;
+       var numRad = numCyc * 2.0 * Math.PI;
+       var radStep = numRad / num;   
+       console.log("Number of cycles: " + numCyc + " Number of points per cycle " + numSamp + " Total number of points " + num);
+
+   //console.log("num " + num); 
+   
+       //Initialize lastX and lastY (i = 0):
+       lastX = rTot - dPen;
+       lastX = lastX + offX;
+       lastX = Math.round(lastX);
+       lastY = 0;
+       lastY = lastY + offY;
+       //console.log("lastX " + lastX + " lastY " + lastY);
+
+//calculate drift amounts per iteration:
+       var xDelta = xDrift / num;
+       var yDelta = yDrift / num;
+       var extDelta = extDrift / num;
+       var intDelta = intDrift / num;
+       var penDelta = penDrift / num;
+       var rDelta = rDrift /num;
+       var gDelta = gDrift /num;
+       var bDelta = bDrift /num;
+       var plotDelta = plotDrift / num;
+
+   //console.log("intDelta " + intDelta);
+
+       var theta = 0.0e0;
+       for (var i = 1; i < num; i++){
+
+          //"cast" from int to double (probably not necessary in JS) and convert from degrees to radians
+          theta = ( 1.0e0 * i ) * radStep;
+
+//cumulative update:
+         rInt = rInt + intDelta;
+         rExt = rExt + extDelta;
+         dPen = dPen + penDelta;
+ 
+        rTot = rInt + rExt;
+        rBrak = rTot / rExt;
+
+         //console.log("rTot " + rTot + " rBrak " + rBrak);
+
+          x = ( rTot * Math.cos(theta) ) - ( dPen * Math.cos(rBrak*theta) ); 
+          //console.log("Math.cos(theta) " + Math.cos(theta) + " Math.cos(rBrak*theta) " + Math.cos(rBrak*theta)); //dbg
+          x = x + offX + i*xDelta;
+          //console.log("x = " + x);
+
+          y = ( rTot * Math.sin(theta) ) - ( dPen * Math.sin(rBrak*theta) ); 
+          //console.log("Math.sin(theta) " + Math.sin(theta) + " Math.sin(rBrak*theta) " + Math.sin(rBrak*theta));  //dbg
+          y = y + offY + i*yDelta;
+          //console.log("theta " + theta + " cosTheta " + Math.cos(theta) + " x = " + x + " y " + y);
+
+          rad = plot0 + i*plotDelta;
+          rad = Math.abs(rad);
+
+//color & opacity:
+          r = r0 + i*rDelta;
+          r = Math.round(Math.abs(r))%255;
+          r = r.toString();
+          g = r0 + i*gDelta;;
+          g = Math.round(Math.abs(g))%255;
+          g = g.toString();     
+          b = b0 + i*bDelta;
+          b = Math.round(Math.abs(b))%255;
+          b = b.toString(); 
+          alpha = 1.0.toString();
+
+          colr = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';      
+
+          //console.log("i " + i + " x " + x + " y " + y); //dbg
+
+          if ( (plotStyle == 'points') || (plotStyle == 'both') ){
+             //call on-board plot() procedure
+             plot(x, y, rad, colr);  //plots the points
+          }
+          if ( (plotStyle == 'line') || (plotStyle == 'both') ){
+             //call on-board draw() procedure
+             draw(lastX, lastY, x, y, rad, colr);  //connects the dots
+          }
+
+//Re-initialize for next iteration:
+          lastX = x;
+          lastY = y;      
+
+       } // end i loop
+       
+   }; //end function main()
+
+//
+//
+// ***  function plot() ***
+//
+//
+       function plot(x, y, r, colr){
+          // A general point plot SVG procedure
+
+          //sanitize:
+          x = Math.round(x);
+          y = Math.round(y);
+          r = Math.round(r);
+          x = x.toString(); 
+          y = y.toString();
+          r = r.toString();
+       
+          var thisCirc = document.createElementNS(xmlns, 'circle');      
+          thisCirc.setAttributeNS(null, 'cx', x); 
+          thisCirc.setAttributeNS(null, 'cy', y);
+          thisCirc.setAttributeNS(null, 'r', r);
+          thisCirc.setAttributeNS(null, 'stroke', colr);
+          thisCirc.setAttributeNS(null, 'stroke-width', '1');
+          thisCirc.setAttributeNS(null, 'fill', 'white');
+
+          thisCnvs.appendChild(thisCirc);
+          
+       }; //end fn plot()
+
+//
+//
+// ***  function draw() ***
+//
+//
+       function draw(x1, y1, x2, y2, thick, colr){
+          //A general 'connect the dots' SVG procedure 
+
+          //sanitize:
+          x1 = Math.round(x1);
+          y1 = Math.round(y1);
+          x2 = Math.round(x2);
+          y2 = Math.round(y2);
+          thick = Math.round(thick);
+          
+          x1 = x1.toString(); 
+          y1 = y1.toString();
+          x2 = x2.toString(); 
+          y2 = y2.toString();
+          thick = thick.toString();
+       
+          var thisLine = document.createElementNS(xmlns, 'line');      
+          thisLine.setAttributeNS(null, 'x1', x1); 
+          thisLine.setAttributeNS(null, 'y1', y1);
+          thisLine.setAttributeNS(null, 'x2', x2); 
+          thisLine.setAttributeNS(null, 'y2', y2);
+          thisLine.setAttributeNS(null, 'stroke', colr);
+          thisLine.setAttributeNS(null, 'stroke-width', thick);
+
+          thisCnvs.appendChild(thisLine);
+          
+       }; //end fn draw()
+
+    </script>
+
+  </body>
+
+</html>
